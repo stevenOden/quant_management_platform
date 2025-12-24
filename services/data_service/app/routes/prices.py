@@ -1,7 +1,5 @@
 from fastapi import APIRouter
 from app.services.data_store import get_session
-from sqlmodel import select
-from app.models.price import LatestPrice, PriceHistory
 from app.services.data_store import (
     get_latest_price,
     get_price_history,
@@ -11,13 +9,14 @@ from app.services.data_store import (
 from app.schemas.price import(
     LatestPriceResponse,
     PriceHistoryItem,
-    PriceHistoryResponse
+    PriceHistoryResponse,
+    PriceIngestResponse
 )
 from app.services.market_data_fetcher import fetch_latest_price
 
-router = APIRouter()
+router = APIRouter(prefix="/prices")
 
-@router.get("/prices/{symbol}/latest", response_model=LatestPriceResponse)
+@router.get("/{symbol}/latest", response_model=LatestPriceResponse)
 def read_latest_price(symbol: str):
     with get_session() as session:
         price = get_latest_price(symbol, session)
@@ -25,14 +24,24 @@ def read_latest_price(symbol: str):
             raise HTTPException(status_code=404, detail="Symbol not found")
         return price
 
-@router.get("/prices/{symbol}/history", response_model=PriceHistoryResponse)
+@router.get("/{symbol}/history", response_model=PriceHistoryResponse)
 def read_price_history(symbol: str, limit: int = 100, order: str = "asc"):
     with get_session() as session:
         history = get_price_history(symbol, limit, session, order=order)
-        return history
+        return PriceHistoryResponse(
+            symbol=symbol,
+            count=len(history),
+            data = [
+                PriceHistoryItem(
+                    price = row.price,
+                    timestamp = row.timestamp
+                )
+                for row in history
+            ]
+        )
 
-@router.post("/prices/{symbol}/fetch")
-def fetch_and_store_price(symbol: str):
+@router.post("/{symbol}/fetch", response_model=PriceIngestResponse)
+async def fetch_and_store_price(symbol: str): # asynch = this function may wait on I/O, don't block thread
     price = fetch_latest_price(symbol)
 
     if price is None:
