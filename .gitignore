@@ -2,6 +2,7 @@
 */~$Fund_Manager_Architecture.pptx
 .idea/
 *.idea/
+*.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
