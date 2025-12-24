@@ -13,4 +13,9 @@ class PriceHistoryItem(SQLModel):
 class PriceHistoryResponse(SQLModel):
     symbol: str
     count: int
-    data:list[PriceHistoryitem]
+    data:list[PriceHistoryItem]
+
+class PriceIngestResponse(SQLModel):
+    symbol: str
+    price: float
+    status: str

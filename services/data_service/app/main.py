@@ -13,7 +13,7 @@ def health_check():
     return {"status": "ok"}
 
 # Include routers
-app.include_router(prices.router, prefix="/prices", tags=["prices"])
+app.include_router(prices.router, tags=["prices"])
 
 # Init Database
 init_db()
