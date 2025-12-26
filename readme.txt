@@ -1,3 +1,5 @@
+For General information, platform overview and system architecture please see: 00_system_architecture/quant_mamangement_platform_architecture.pptx
+
 market_data_fetcher: main.py lists the tickers to get data for
 to run:
 > cd C:\Content\Python_Projects\Github_Projects\quant_management_platform\services
