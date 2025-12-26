@@ -1,15 +1,6 @@
 from sqlmodel import SQLModel, create_engine, Session, select
 from app.models.price import LatestPrice, PriceHistory
-from datetime import datetime
-
-DATABASE_URL = "sqlite:///./prices.db"
-engine = create_engine(DATABASE_URL, echo=True)
-
-def init_db():
-    SQLModel.metadata.create_all(engine)
-
-def get_session():
-    return Session(engine)
+from datetime import datetime, timezone
 
 def normalize_symbol(symbol: str) -> str:
     return symbol.strip().upper()
@@ -41,10 +32,12 @@ def save_latest_price(symbol: str, price: float, session):
     statement = select(LatestPrice).where(LatestPrice.symbol == symbol)
     existing = session.exec(statement).first()
 
+    now = datetime.now(timezone.utc)
+
     # 2. If it exists, update it
     if existing:
         existing.price = price
-        existing.timestamp=datetime.utcnow()
+        existing.timestamp = now
         session.add(existing) # insert into LatestPrice updated row for symbol
 
 
@@ -53,7 +46,7 @@ def save_latest_price(symbol: str, price: float, session):
         new_row = LatestPrice(
             symbol=symbol,
             price=price,
-            timestamp=datetime.utcnow()
+            timestamp= now
         )
         session.add(new_row) # insert the newly constructed row
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from ..db import get_session
 from ..models.position import Position
-from ..schemas.position import PositionCreate, PositionRead
+from ..schemas.position import PositionCreate, PositionRead, TradeUpdate
 from ..schemas.valuation import PositionValuation, PortfolioSummary
 import httpx
 
@@ -64,5 +64,49 @@ def read_position(symbol: str, session: Session = Depends(get_session)):
     position = session.exec(select(Position).where(Position.symbol == symbol.upper())).first()
     if not position:
         raise HTTPException(status_code=404, detail="Postition not found")
+
+    return position
+
+@router.post("/positions/update", response_model = PositionRead)
+def update_position_from_trade(trade:TradeUpdate, session: Session = Depends(get_session)):
+    position = session.exec(select(Position).where(Position.symbol == trade.symbol.upper())).first()
+
+    symbol = trade.symbol.upper()
+    qty = trade.quantity
+    price = trade.price
+    side = trade.side.upper()
+
+    if position is None:
+        if side == "BUY":
+            position = Position(
+                symbol=symbol,
+                quantity=qty,
+                average_cost=price
+            )
+        else:
+            raise HTTPException(status_code=400, detail="Cannot SELL a non-existant position")
+
+    else:
+        current_value = position.quantity * position.average_cost
+
+        if side == "BUY":
+            new_value = current_value + qty * price
+            new_quantity = position.quantity + qty
+            position.average_cost = new_value / new_quantity
+            position.quantity = new_quantity
+
+        elif side == "SELL":
+            new_quantity = position.quantity - qty
+            position.quantity = new_quantity
+            if new_quantity == 0:
+                position.average_cost = 0 # reset the cost if position is fully closed
+            elif new_quantity < 0:
+                raise HTTPException(status_code=400, detail="Cannot SELL more than the current position quantity")
+        else:
+            raise HTTPException(status_code=400, detail="Unexpected side type")
+
+    session.add(position)
+    session.commit()
+    session.refresh(position)
 
     return position
