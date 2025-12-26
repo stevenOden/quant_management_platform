@@ -5,7 +5,7 @@ def load_symbols():
 
     # Later load from env, config file, or pull all from data service
 
-    return ["AAPL", "MSFT", "GOOG"]
+    return ["AAPL", "MSFT", "GOOG", "TLT"]
 
 if __name__ == "__main__":
     symbols = load_symbols()
