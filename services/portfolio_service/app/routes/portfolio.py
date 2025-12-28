@@ -6,7 +6,7 @@ from ..schemas.position import PositionCreate, PositionRead, TradeUpdate
 from ..schemas.valuation import PositionValuation, PortfolioSummary
 import httpx
 
-router = APIRouter()
+router = APIRouter(prefix="/portfolio", tags =["portfolio"])
 
 DATA_SERVICE_URL = "http://localhost:8001/prices"
 

@@ -2,7 +2,7 @@ from sqlmodel import SQLModel, Field
 from datetime import datetime, timezone
 
 class Trade(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True) # let the db assign id
+    trade_id: int | None = Field(default=None, primary_key=True) # let the db assign id
     symbol: str
     quantity: float
     price: float

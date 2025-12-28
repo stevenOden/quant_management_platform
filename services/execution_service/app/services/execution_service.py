@@ -56,7 +56,7 @@ async def execute_trade(trade_in, session: Session):
 
 async def notify_portfolio(executed_trade):
     payload = {
-        "trade_id": executed_trade.id,
+        "trade_id": executed_trade.trade_id,
         "symbol": executed_trade.symbol,
         "quantity": executed_trade.quantity,
         "price": executed_trade.price,

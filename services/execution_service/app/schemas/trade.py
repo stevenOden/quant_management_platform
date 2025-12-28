@@ -7,6 +7,7 @@ class TradeCreate(BaseModel):
     side: str # "BUY" or "SELL"
 
 class TradeRead(BaseModel):
+    trade_id: int
     symbol: str
     quantity: float
     price: float
