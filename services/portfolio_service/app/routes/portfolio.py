@@ -6,7 +6,7 @@ from ..schemas.position import PositionCreate, PositionRead, TradeUpdate
 from ..schemas.valuation import PositionValuation, PortfolioSummary
 import httpx
 
-router = APIRouter()
+router = APIRouter(prefix="/portfolio", tags =["portfolio"])
 
 DATA_SERVICE_URL = "http://localhost:8001/prices"
 
@@ -71,6 +71,10 @@ def read_position(symbol: str, session: Session = Depends(get_session)):
 def update_position_from_trade(trade:TradeUpdate, session: Session = Depends(get_session)):
     position = session.exec(select(Position).where(Position.symbol == trade.symbol.upper())).first()
 
+    # 0. Idempotency check (avoid duplicate portfolio updates)
+    if position and position.last_trade_id == trade.trade_id:
+        return position
+
     symbol = trade.symbol.upper()
     qty = trade.quantity
     price = trade.price
@@ -105,6 +109,7 @@ def update_position_from_trade(trade:TradeUpdate, session: Session = Depends(get
         else:
             raise HTTPException(status_code=400, detail="Unexpected side type")
 
+    position.last_trade_id = trade.trade_id
     session.add(position)
     session.commit()
     session.refresh(position)

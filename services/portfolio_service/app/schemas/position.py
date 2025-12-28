@@ -17,3 +17,4 @@ class TradeUpdate(SQLModel):
     price: float
     side: str
     timestamp: datetime
+    trade_id: int

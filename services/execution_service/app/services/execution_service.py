@@ -1,15 +1,24 @@
 import httpx
 import asyncio
 from sqlmodel import Session
-from app.models.trade import Trade
+from app.models.trade import Trade, SystemState
 from fastapi import HTTPException
+from app.db import engine
 
 DATA_SERVICE_URL = "http://localhost:8001/prices"
 PORTFOLIO_SERVICE_URL = "http://localhost:8002/portfolio"
 async def execute_trade(trade_in, session: Session):
     symbol = trade_in.symbol.upper()
 
-    # 0. If trade is a sell verify that portfolio hold enough to execute
+    # 0. Check Portfolio state to determine if trades can be executed
+    state = session.get(SystemState,1)
+    if state.portfolio_sync_required:
+        raise HTTPException(
+            status_code=503,
+            detail="Trading temporarily disabled until portfolio is resynchronized"
+        )
+
+    # 1. If trade is a sell verify that portfolio hold enough to execute
     side = trade_in.side.upper()
     qty = trade_in.quantity
     if side == "SELL":
@@ -22,12 +31,12 @@ async def execute_trade(trade_in, session: Session):
                 raise HTTPException(status_code=400, detail="Cannot execute SELL: trade qty exceeds portfolio qty")
 
 
-    # 1. Fetch latest price from data_service
+    # 2. Fetch latest price from data_service
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{DATA_SERVICE_URL}/{symbol}/latest")
         latest_price = response.json()["price"]
 
-    # 2. Create trade record
+    # 3. Create trade record
     trade = Trade(
         symbol=symbol,
         quantity=trade_in.quantity,
@@ -35,19 +44,19 @@ async def execute_trade(trade_in, session: Session):
         side=trade_in.side.upper(),
     )
 
-    # 3. Commit to DB
+    # 4. Commit to DB
     session.add(trade)
     session.commit()
     session.refresh(trade)
 
-    # 4. Notify Portfolio Service
+    # 5. Notify Portfolio Service
     asyncio.create_task(notify_portfolio(trade))
 
     return trade
 
 async def notify_portfolio(executed_trade):
     payload = {
-        "trade_id": executed_trade.id,
+        "trade_id": executed_trade.trade_id,
         "symbol": executed_trade.symbol,
         "quantity": executed_trade.quantity,
         "price": executed_trade.price,
@@ -71,8 +80,17 @@ async def notify_portfolio(executed_trade):
                 print(f"Portfolio update failed: {e}, retrying")
 
                 if attempt == max_retries:
-                    print("Cannot update Portfolio")
+                    print("Cannot update Portfolio, blocking future trades until portfolio is resynchronized")
+                    await mark_portfolio_sync_required()
                     return False
 
                 await asyncio.sleep(backoff)
                 backoff *=2 # exponential backoff
+
+def mark_portfolio_sync_required():
+    '''Set the SystemState flag to True to initiate a portfolio re-sync'''
+    with Session(engine) as session:
+        state = session.get(SystemState,1)
+        state.portfolio_sync_required = True
+        session.add(state)
+        session.commit()
