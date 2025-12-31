@@ -1,10 +1,10 @@
 import logging
-from app.ingestion.web_scraper.stockAnalysis_scraper import StockAnalysisScraper
-from app.ingestion.web_scraper.stockAnalysis_normalizer import normalize_stockanalysis_row
-from app.ingestion.upsert_ipo_events import upsert_ipo_events
+from app.ingestion_pipeline.web_scraper.stockAnalysis_scraper import StockAnalysisScraper
+from app.ingestion_pipeline.web_scraper.stockAnalysis_normalizer import normalize_stockanalysis_row
+from app.ingestion_pipeline.upsert_ipo_events import upsert_ipo_events
 logger = logging.getLogger(__name__)
 
-async def run_ipo_ingestion():
+async def run_ipo_ingestion_pipeline():
     """
     Orchestrates new IPO data ingestion pipeline
     1.Scrape and parse https://stockanalysis.com/ipos/calendar/ for raw ipo rows

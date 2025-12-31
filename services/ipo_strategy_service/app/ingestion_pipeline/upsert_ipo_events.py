@@ -1,6 +1,6 @@
 from sqlmodel import Session,select
-from ..db import engine
-from ..models.ipo import IPOEvent
+from app.db import engine
+from app.models.ipo_event import IPOEvent
 
 def upsert_ipo_events(events):
     with Session(engine) as session:
