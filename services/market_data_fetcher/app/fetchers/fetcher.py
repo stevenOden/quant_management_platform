@@ -1,5 +1,5 @@
 import requests
-from .config import (
+from app.config import (
 DATA_SERVICE_URL
 )
 
