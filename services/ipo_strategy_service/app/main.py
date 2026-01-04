@@ -5,8 +5,9 @@ import logging
 from app.db import create_db_and_tables
 from app.routes.ipo_events import router as ipo_event_router
 
-from ingestion_pipeline.ingestion_pipeline_main import run_ipo_ingestion_pipeline
-from universe_pipeline.universe_pipeline_main import run_universe_pipeline
+from app.ingestion_pipeline.ingestion_pipeline_main import run_ipo_ingestion_pipeline
+from app.universe_pipeline.universe_pipeline_main import run_universe_pipeline
+from app.state_machine_pipeline.state_machine_main import run_state_machine_pipeline
 
 logger = logging.getLogger(__name__)
 
@@ -48,5 +49,6 @@ async def health():
 if __name__ == "__main__":
     import asyncio
     create_db_and_tables()
-    asyncio.run(run_ipo_ingestion_pipeline())
-    asyncio.run(run_universe_pipeline())
+    # asyncio.run(run_ipo_ingestion_pipeline())
+    # asyncio.run(run_universe_pipeline())
+    asyncio.run(run_state_machine_pipeline())

@@ -30,6 +30,9 @@ class IPOEvent(SQLModel, table=True):
     last_signal_at: datetime | None = None # Default to None on DISCOVERY State
     last_trade_id: str | None = None # Default to None on DISCOVERY State
     last_trade_at: datetime | None = None # Default to None on DISCOVERY State
+    ipo_price: float | None = None # Default to None on DISCOVERY State
+    highest_close: float | None = None # Default to None on DISCOVERY State
+    highest_close_at: datetime | None = None # Default to None on DISCOVERY State
 
     # Strategy parameters (optional but useful)
     target_gain_pct: float | None = None # Default to None on DISCOVERY State

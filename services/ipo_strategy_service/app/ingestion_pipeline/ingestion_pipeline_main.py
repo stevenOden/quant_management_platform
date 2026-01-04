@@ -18,9 +18,9 @@ async def run_ipo_ingestion_pipeline():
 
     ## DEBUG
     raw_data_rows = [{
-        "ipo_date": "Dec 30, 2025",
-        "symbol": "TEST",
-        "company_name": "Test Company",
+        "ipo_date": "Jan 02, 2026",
+        "symbol": "PLAY",
+        "company_name": "Dave and Busters",
         "exchange": "NASDAQ",
         "price_range": "$10.00",
         "shares_offered": "10M",
