@@ -78,6 +78,8 @@ async def run_state_machine_pipeline():
                     event.holding_since = datetime.now(timezone.utc)
                     # TODO: What to do if the portfolio and execution service become unsynced? No more trades will be placed, but cannot sell current positions
                     # 5. Update the IntradayWatchlist to add this symbol to the intraday stream
+                    intraday_watch = data_service_client.add_intraday_watchlist_symbol(event.symbol)
+
                     session.add(event)
             except Exception:
                 logger.exception(f"Error processing state machine for {event.symbol}")

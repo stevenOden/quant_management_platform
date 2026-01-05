@@ -4,6 +4,7 @@ from app.db import create_db_and_tables
 from app.routes.prices import router as price_router
 from app.routes.universe import router as universe_router
 from app.routes.daily_ohlcv import router as daily_ohlcv_router
+from app.routes.intraday_watchlist import router as intraday_watchlist_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,6 +21,7 @@ app = FastAPI(
 app.include_router(price_router, tags=["prices"])
 app.include_router(universe_router, tags=["universe"])
 app.include_router(daily_ohlcv_router, tags = ["daily-ohlcv"])
+app.include_router(intraday_watchlist_router, tags=["intraday_watchlist"])
 
 @app.get("/health", tags=["health"])
 def health_check():

@@ -8,3 +8,9 @@ class SymbolResponse(SQLModel):
     is_active: bool
     added_at: datetime
     deactivated_at: datetime | None
+
+class IntradaySymbolResponse(SQLModel):
+    id: int
+    symbol: str
+    source: str
+    added_at: datetime
