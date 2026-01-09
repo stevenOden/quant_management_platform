@@ -14,4 +14,4 @@ def trigger_data_service_ohlcv_fetch(symbol:str,day:date):
     url = f"{DATA_SERVICE_URL}/daily/fetch/{symbol}/{day}"
     response = requests.post(url)
     response.raise_for_status()
-    return response.json
+    return response.json()

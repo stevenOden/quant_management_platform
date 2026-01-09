@@ -53,7 +53,7 @@ async def market_data_loop(
             # 1. Refesh watchlist from Data Service
             symbols = await data_service_client.get_intraday_watchlist()
             watchlist_manager.update(symbols)
-            
+
             # 2. Fetch and publish latest data bar for each symbol
 
             for symbol in watchlist_manager.symbols:
