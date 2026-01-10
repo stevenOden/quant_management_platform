@@ -18,29 +18,37 @@ execution_service_client = ExecutionServiceClient(EXECUTION_SERVICE_URL)
 def get_today_utc() -> date:
     return datetime.now(timezone.utc).date()
 
+def get_today_current_timezone() -> date:
+    return datetime.now().date()
+
 def get_tomorrow():
     return (datetime.now(timezone.utc) + timedelta(days=1)).date()
 
-def get_yesterday(event):
-    return (event.ipo_date - timedelta(days=1)).date()
+def get_yesterday():
+    return (datetime.now() - timedelta(days=1)).date()
 
-async def run_state_machine_pipeline():
+async def run_evaluation_pipeline():
     '''Evaluate non-signal generating time based state transitions and data collection'''
 
     with Session(engine) as session:
-        today = get_today_utc()
+        # today = get_today_utc()
+        # today = get_today_current_timezone()
+        today = get_yesterday()
         logger.info(f"State machine pipeline started for {today}")
 
         ready_events = session.exec(select(IPOEvent).where(IPOEvent.state==IPOState.READY)).all()
 
         for event in ready_events:
             try:
-                if transition_to_buy_signal(event,today):
+                if await transition_to_buy_signal(event,today):
                     logger.info(f"{event.symbol}: READY -> BUY_SIGNAL")
                     event.state = IPOState.BUY_SIGNAL
                     event.entry_signal_price = await data_service_client.get_current_price(event.symbol)
+                    ## DEBUG
+                    # event.entry_signal_price+=10
+                    ## END_DEBUG
                     event.last_signal = "BUY"
-                    event.last_signal_at = datetime.now(timezone.utc)
+                    event.last_signal_at = today
                     session.add(event)
             except Exception:
                 logger.exception(f"Error processing state machine for {event.symbol}")
@@ -49,7 +57,7 @@ async def run_state_machine_pipeline():
 
         for event in buy_signal_events:
             try:
-                if transition_to_holding(event,today):
+                if await transition_to_holding(event,today):
                     '''This will not commit unless the trade info is returned correctly from execution service'''
 
                     # 1. Calculate the quantity based off fixed position size and current price
@@ -61,7 +69,7 @@ async def run_state_machine_pipeline():
 
                     #2. Calculate Stop Loss and Take Profit values
                     event.target_gain_pct = 20.0
-                    event.target_price = (event.target_gain_percentage+100)/100 * current_price
+                    event.target_price = (event.target_gain_pct+100)/100 * current_price
                     event.stop_loss_pct = 10.0
                     event.stop_loss_price = (100 - event.stop_loss_pct)/100 * current_price
 
@@ -74,13 +82,16 @@ async def run_state_machine_pipeline():
                     event.entry_price = trade_info.price
                     event.position_num_share = trade_info.quantity
                     event.position_entry_value = trade_info.price * trade_info.quantity
+                    # TODO Save off trade_id -> add to sql model
                     event.state = IPOState.HOLDING
-                    event.holding_since = datetime.now(timezone.utc)
+                    event.holding_since = datetime.now()
                     # TODO: What to do if the portfolio and execution service become unsynced? No more trades will be placed, but cannot sell current positions
-                    # 5. Update the IntradayWatchlist to add this symbol to the intraday stream
-                    intraday_watch = data_service_client.add_intraday_watchlist_symbol(event.symbol)
 
-                    session.add(event)
+                    # 5. Update the IntradayWatchlist to add this symbol to the intraday stream
+                    intraday_watch = await data_service_client.add_intraday_watchlist_symbol(event.symbol)
+                    if intraday_watch:
+                        session.add(event)
+
             except Exception:
                 logger.exception(f"Error processing state machine for {event.symbol}")
 

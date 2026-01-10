@@ -9,7 +9,7 @@ class ExecutionServiceClient:
     async def execute_trade(self, symbol: str, quantity: float, side: str ) -> Trade | None:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{self.base_url}/universe/symbols",
+                f"{self.base_url}/execute/",
                 json={"symbol":symbol, "quantity":quantity, "side":side},
                 timeout=10.0
             )

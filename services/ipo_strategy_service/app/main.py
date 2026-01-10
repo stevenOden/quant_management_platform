@@ -8,18 +8,19 @@ from app.routes.ipo_events import router as ipo_event_router
 from app.ingestion_pipeline.ingestion_pipeline_main import run_ipo_ingestion_pipeline
 from app.universe_pipeline.universe_pipeline_main import run_universe_pipeline
 from app.state_machine_pipeline.state_machine_main import run_state_machine_pipeline
+from app.evaluation_pipeline.evaluation_pipeline_main import run_evaluation_pipeline
 
 logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    scheduler_task = asyncio.create_task(scheduler_loop())
+    # scheduler_task = asyncio.create_task(scheduler_loop())
     logger.info("Scheduler started")
     create_db_and_tables()
     yield
 
     # Shutdown
-    scheduler_task.cancel()
+    # scheduler_task.cancel()
     logger.info("Scheduler stopped")
 
 async def scheduler_loop():
@@ -51,4 +52,5 @@ if __name__ == "__main__":
     create_db_and_tables()
     # asyncio.run(run_ipo_ingestion_pipeline())
     # asyncio.run(run_universe_pipeline())
-    asyncio.run(run_state_machine_pipeline())
+    # asyncio.run(run_state_machine_pipeline())
+    asyncio.run(run_evaluation_pipeline())

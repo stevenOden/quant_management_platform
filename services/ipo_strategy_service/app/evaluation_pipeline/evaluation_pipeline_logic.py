@@ -20,6 +20,9 @@ async def transition_to_buy_signal(event: IPOEvent, today: date) -> bool:
     if event.state == IPOState.READY:
         ## TODO make sure this doesn't get executed before market close
         ohlcv_data = await data_service_client.get_daily_ohlcv_data(event.symbol,today)
+        ## DEBUG
+        # ohlcv_data.close += 10
+        ## END_DEBUG
         if ohlcv_data.close > event.highest_close:
             return True
     return False

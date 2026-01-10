@@ -1,7 +1,9 @@
 from sqlmodel import SQLModel
 from datetime import datetime
+from pydantic import ConfigDict
 
 class IPOEventResponse(SQLModel):
+    # model_config = ConfigDict(from_attributes=True, extra='ignore')
     id: int
     symbol: str
     # Raw IPO Data from Scraper or API
@@ -19,6 +21,8 @@ class IPOEventResponse(SQLModel):
     # Strategy metadata
     last_signal: str | None
     last_signal_at: datetime | None
+    highest_close: float | None
+    highest_close_at: datetime | None
 
     # Strategy parameters
     target_price: float | None

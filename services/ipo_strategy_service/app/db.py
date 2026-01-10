@@ -1,6 +1,8 @@
 from sqlmodel import SQLModel, create_engine, Session
-
-DATABASE_URL = "sqlite:///./ipo_strategy.db"
+## DEBUG
+# DATABASE_URL = "sqlite:///./app/ipo_strategy.db"
+DATABASE_URL = "sqlite:///./ipo_strategy.db" # <- Use this when done dubugging
+## END DEBUG
 engine = create_engine(DATABASE_URL, echo=False)
 
 def create_db_and_tables():

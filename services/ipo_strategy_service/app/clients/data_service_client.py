@@ -27,7 +27,7 @@ class DataServiceClient:
 
     async def get_current_price(self, symbol: str):
         url = f"{self.base_url}/prices/{symbol}/latest"
-        with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient() as client:
             response = await client.get(url)
             if response.status_code == 404:
                 return None
