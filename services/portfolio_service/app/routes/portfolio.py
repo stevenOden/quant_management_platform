@@ -28,7 +28,7 @@ async def get_portfolio(session: Session = Depends(get_session)):
 
     async with httpx.AsyncClient() as client: # create single async http client
         for pos in positions:
-            r = await client.get(f"{DATA_SERVICE_URL}/{pos.symbol}/latest")
+            r = await client.post(f"{DATA_SERVICE_URL}/{pos.symbol}/fetch")
             latest_price = r.json()["price"]
 
             mv = pos.quantity * latest_price

@@ -1,12 +1,14 @@
 import httpx
 import asyncio
 from sqlmodel import Session
+from statsmodels.tools.web import BASE_URL
+
 from app.models.trade import Trade, SystemState
 from fastapi import HTTPException
 from app.db import engine
 
-DATA_SERVICE_URL = "http://localhost:8001/prices"
-PORTFOLIO_SERVICE_URL = "http://localhost:8002/portfolio"
+DATA_SERVICE_URL = "http://localhost:8001"
+PORTFOLIO_SERVICE_URL = "http://localhost:8002"
 async def execute_trade(trade_in, session: Session):
     symbol = trade_in.symbol.upper()
 
@@ -32,8 +34,9 @@ async def execute_trade(trade_in, session: Session):
 
 
     # 2. Fetch latest price from data_service
-    async with httpx.AsyncClient() as client:
-        response = await client.get(f"{DATA_SERVICE_URL}/{symbol}/latest")
+    async with httpx.AsyncClient() as client: # TODO UPDATE THIS TO USE STREAM
+        # a. Fetch the current price
+        response = await client.post(f"{DATA_SERVICE_URL}/prices/{symbol}/fetch")
         latest_price = response.json()["price"]
 
     # 3. Create trade record
@@ -69,7 +72,7 @@ async def notify_portfolio(executed_trade):
         for attempt in range(1, max_retries + 1):
             try:
                 response = await client.post(
-                    f"{PORTFOLIO_SERVICE_URL}/positions/update",
+                    f"{PORTFOLIO_SERVICE_URL}/portfolio/positions/update",
                     json=payload,
                     timeout=10
                 )
