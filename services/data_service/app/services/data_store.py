@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, create_engine, Session, select
+from sqlmodel import select
 from app.models.price import LatestPrice, PriceHistory
 from datetime import datetime, timezone
 

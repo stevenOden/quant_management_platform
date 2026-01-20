@@ -1,18 +1,10 @@
-from .scheduler import run_scheduler, run_daily_scheduler
-
-def load_symbols():
-    # Hardcoded for testing
-
-    # Later load from env, config file, or pull all from data service
-
-    return ["AAPL", "MSFT", "GOOG", "TLT"]
+from app.scheduler import run_scheduler, run_daily_scheduler
 
 if __name__ == "__main__":
-    symbols = load_symbols()
 
-    USE_DAILY = False
+    USE_DAILY = True
 
     if USE_DAILY:
-        run_daily_scheduler(symbols)
+        run_daily_scheduler()
     else:
-        run_scheduler(symbols)
+        run_scheduler()
