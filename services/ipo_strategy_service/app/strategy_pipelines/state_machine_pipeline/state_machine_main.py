@@ -3,14 +3,14 @@ import logging
 from sqlmodel import Session, select
 from app.models.ipo_event import IPOEvent
 from app.enums.ipo_state import IPOState
-from app.state_machine_pipeline.state_machine_logic import transition_to_ipo_day, transition_to_ready, transition_to_missed
+from app.strategy_pipelines.state_machine_pipeline.state_machine_logic import transition_to_ipo_day, transition_to_ready, transition_to_missed
 from app.clients.data_service_client import DataServiceClient
 from app.config import DATA_SERVICE_URL
 from app.db import engine
 
 logger = logging.getLogger(__name__)
 
-data_service_client = DataServiceClient(DATA_SERVICE_URL)
+data_service_client = DataServiceClient()
 
 def get_today_utc() -> date:
     return datetime.now(timezone.utc).date()

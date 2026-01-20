@@ -1,7 +1,7 @@
 import logging
-from app.ingestion_pipeline.web_scraper.stockAnalysis_scraper import StockAnalysisScraper
-from app.ingestion_pipeline.web_scraper.stockAnalysis_normalizer import normalize_stockanalysis_row
-from app.ingestion_pipeline.upsert_ipo_events import upsert_ipo_events
+from app.strategy_pipelines.ingestion_pipeline.web_scraper.stockAnalysis_scraper import StockAnalysisScraper
+from app.strategy_pipelines.ingestion_pipeline.web_scraper.stockAnalysis_normalizer import normalize_stockanalysis_row
+from app.strategy_pipelines.ingestion_pipeline.upsert_ipo_events import upsert_ipo_events
 logger = logging.getLogger(__name__)
 
 async def run_ipo_ingestion_pipeline():

@@ -3,17 +3,16 @@ import logging
 from sqlmodel import Session, select
 from app.models.ipo_event import IPOEvent
 from app.enums.ipo_state import IPOState
-from app.evaluation_pipeline.evaluation_pipeline_logic import transition_to_buy_signal, transition_to_holding
+from app.strategy_pipelines.evaluation_pipeline.evaluation_pipeline_logic import transition_to_buy_signal, transition_to_holding
 from app.clients.data_service_client import DataServiceClient
 from app.clients.execution_service_client import ExecutionServiceClient
-from app.config import DATA_SERVICE_URL,EXECUTION_SERVICE_URL
 
 from app.db import engine
 
 logger = logging.getLogger(__name__)
 
-data_service_client = DataServiceClient(DATA_SERVICE_URL)
-execution_service_client = ExecutionServiceClient(EXECUTION_SERVICE_URL)
+data_service_client = DataServiceClient()
+execution_service_client = ExecutionServiceClient()
 
 def get_today_utc() -> date:
     return datetime.now(timezone.utc).date()

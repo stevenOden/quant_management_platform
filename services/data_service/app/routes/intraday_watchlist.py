@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session
 from app.db import get_session
 from app.models.intraday_watchlist import IntradayWatchlist
@@ -17,9 +17,9 @@ def register_symbol(payload: IntradayWatchlistRequest, session: Session = Depend
     return add_intraday_symbol(session, payload.symbol, payload.source)
 
 @router.get("/symbols", response_model=list[str])
-def list_symbols(session: Session = Depends(get_session)):
+def list_symbols(source: str | None = Query(None), session: Session = Depends(get_session)):
     '''List all symbols in universe. Optionally filters on active only, default is true'''
-    return get_intraday_symbols(session)
+    return get_intraday_symbols(session,source)
 
 @router.delete("/symbols/remove", response_model=IntradayWatchlist)
 def deactivate_symbol_route(symbol: str, source: str, session: Session = Depends(get_session)):

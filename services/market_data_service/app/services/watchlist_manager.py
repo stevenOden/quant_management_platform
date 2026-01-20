@@ -8,5 +8,5 @@ class WatchlistManager:
         self._symbols = set(symbols)
 
     @property
-    def symbols(self) -> list(str):
+    def symbols(self) -> list[str]:
         return sorted(self._symbols)

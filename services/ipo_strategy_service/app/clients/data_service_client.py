@@ -3,10 +3,11 @@ from datetime import date
 from sqlmodel import Session
 from app.schemas.universe import SymbolResponse, IntradaySymbolResponse
 from app.schemas.daily_ohlcv import DailyOHLCVResponse
+from app.config import DATA_SERVICE_URL
 
 class DataServiceClient:
-    def __init__(self, base_url: str):
-        self.base_url = base_url.rstrip("/")
+    def __init__(self):
+        self.base_url = DATA_SERVICE_URL
     async def register_symbol(self, symbol: str, source: str = "ipo_strategy") -> SymbolResponse:
         async with httpx.AsyncClient() as client:
             response = await client.post(

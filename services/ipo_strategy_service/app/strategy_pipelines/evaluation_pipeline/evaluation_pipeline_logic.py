@@ -5,15 +5,13 @@ import httpx
 from app.models.ipo_event import IPOEvent
 from app.enums.ipo_state import IPOState
 from app.clients.data_service_client import DataServiceClient
-from app.config import DATA_SERVICE_URL
 from app.clients.execution_service_client import ExecutionServiceClient
-from app.config import EXECUTION_SERVICE_URL
 
 
 ''' Pure strategy logic: takes price + IPOEvent, returns signals'''
 
-data_service_client = DataServiceClient(DATA_SERVICE_URL)
-execution_service_client = ExecutionServiceClient(EXECUTION_SERVICE_URL)
+data_service_client = DataServiceClient()
+execution_service_client = ExecutionServiceClient()
 
 async def transition_to_buy_signal(event: IPOEvent, today: date) -> bool:
     '''Transition from State READY -> BUY_SIGNAL if today's closing price is all-time high'''

@@ -1,7 +1,7 @@
 import httpx
 from typing import List, Dict, Any
-from app.ingestion_pipeline.web_scraper.base_scraper import BaseScraper
-from app.ingestion_pipeline.web_scraper.stockAnalysis_parser import parse_stockanalysis_html
+from app.strategy_pipelines.ingestion_pipeline.web_scraper.base_scraper import BaseScraper
+from app.strategy_pipelines.ingestion_pipeline.web_scraper.stockAnalysis_parser import parse_stockanalysis_html
 
 WEB_URL = f"https://stockanalysis.com/ipos/calendar/"
 

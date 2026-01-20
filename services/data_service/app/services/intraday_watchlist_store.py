@@ -36,9 +36,11 @@ def remove_intraday_symbol(session: Session, symbol: str, source: str) -> Intrad
 
     return row
 
-def get_intraday_symbols(session: Session) -> list[str]:
-    '''Return all symbols in the universe. Can be filtered on only active symbols'''
-    rows = session.exec(select(IntradayWatchlist.symbol).distinct())
-    symbols = [row[0] for row in rows]
-
+def get_intraday_symbols(session: Session, strategy: str | None) -> list[str]:
+    '''Return all symbols in intraday watchlist, or filters on strategy if provided'''
+    if strategy is None:
+        rows = session.exec(select(IntradayWatchlist.symbol).distinct())
+    else:
+        rows = session.exec(select(IntradayWatchlist.symbol).where(IntradayWatchlist.source == strategy).distinct())
+    symbols = [row for row in rows]
     return symbols
