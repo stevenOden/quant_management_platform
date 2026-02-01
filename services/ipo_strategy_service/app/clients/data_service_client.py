@@ -46,9 +46,10 @@ class DataServiceClient:
 
     async def remove_intraday_watchlist_symbol(self, symbol: str, source: str = "ipo_strategy"):
         async with httpx.AsyncClient() as client:
-            response = await client.post(
+            response = await client.request(
+                "DELETE",
                 f"{self.base_url}/intraday_watchlist/symbols/remove",
-                json={"symbol":symbol, "source":source},
+                params={"symbol":symbol, "source":source},
                 timeout=10.0
             )
             response.raise_for_status()

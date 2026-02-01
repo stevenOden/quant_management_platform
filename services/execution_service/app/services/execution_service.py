@@ -1,7 +1,6 @@
 import httpx
 import asyncio
 from sqlmodel import Session
-from statsmodels.tools.web import BASE_URL
 
 from app.models.trade import Trade, SystemState
 from fastapi import HTTPException
@@ -25,7 +24,7 @@ async def execute_trade(trade_in, session: Session):
     qty = trade_in.quantity
     if side == "SELL":
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"{PORTFOLIO_SERVICE_URL}/positions/{symbol}")
+            response = await client.get(f"{PORTFOLIO_SERVICE_URL}/portfolio/positions/{symbol}")
             if response.status_code == 404:
                 raise HTTPException(status_code = 400, detail="Cannot execute SELL on symbol not held in portfolio")
             curr_qty = response.json()["quantity"]

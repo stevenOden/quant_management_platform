@@ -27,3 +27,12 @@ app.include_router(intraday_watchlist_router, tags=["intraday_watchlist"])
 def health_check():
     return {"status": "ok"}
 
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host="127.0.0.1",
+        port=8001,
+        reload=True,
+        log_level="debug",
+    )
