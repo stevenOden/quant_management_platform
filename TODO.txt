@@ -1,0 +1,22 @@
+TODO:
+x create ipo_day_pipeline
+
+x combine buy_signal and ready into entry_evaluation pipeline
+
+x coordinate all pipelines in schedular
+
+x set all datetimes in ipo strategy to EST
+
+x move all date setting functions to a utility script
+
+x add buy_trade_id and sell_trade_id to sql model so this information gets stored
+
+test whole ipo_strategy
+
+update symbol universe to be symbol/strategy pairing like intraday watchlist
+
+make position_value in buy_signal pipeline a fraction of portfolio value, instead of constant
+
+think about refactoring the execution service to allow sell signals to be executed in case of portfolio desync
+
+write unit tests

@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel, Field
 from datetime import datetime, timezone
+from app.utility import get_time_eastern_timezone
 
 class IPOEvent(SQLModel, table=True):
 
@@ -19,7 +20,7 @@ class IPOEvent(SQLModel, table=True):
 
     # Strategy State Machine
     state: str = Field(default="DISCOVERED") # DISCOVERED, WATCHING, READY, BUY_SIGNAL, HOLDING, EXITED
-    discovered_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    discovered_at: datetime = Field(default_factory=lambda: get_time_eastern_timezone())
     watching_since: datetime | None = None # Default to None on DISCOVERY State
     ready_since: datetime | None = None # Default to None on DISCOVERY State
     holding_since: datetime | None = None # Default to None on DISCOVERY State
@@ -29,6 +30,8 @@ class IPOEvent(SQLModel, table=True):
     last_signal: str | None = None # Default to None on DISCOVERY State
     last_signal_at: datetime | None = None # Default to None on DISCOVERY State
     last_trade_id: str | None = None # Default to None on DISCOVERY State
+    entry_trade_id: int | None = None # Default to None on DISCOVERY State
+    exit_trade_id: int | None = None # Default to None on DISCOVERY State
     last_trade_at: datetime | None = None # Default to None on DISCOVERY State
     ipo_price: float | None = None # Default to None on DISCOVERY State
     highest_close: float | None = None # Default to None on DISCOVERY State

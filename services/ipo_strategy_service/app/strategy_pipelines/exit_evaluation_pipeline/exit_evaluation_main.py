@@ -5,7 +5,7 @@ from app.enums.ipo_state import IPOState
 from app.clients.market_data_service_client import MarketDataServiceClient
 from app.clients.data_service_client import DataServiceClient
 from app.clients.execution_service_client import ExecutionServiceClient
-from app.strategy_pipelines.evaluation_pipeline.evaluation_pipeline_main import data_service_client
+from app.strategy_pipelines.entry_evaluation_pipeline.entry_evaluation_pipeline_main import data_service_client
 from app.strategy_pipelines.exit_evaluation_pipeline.exit_evaluation_logic import ExitLogic
 from app.strategy_pipelines.exit_evaluation_pipeline.exit_evaluation_engine import ExitEvaluationEngine
 

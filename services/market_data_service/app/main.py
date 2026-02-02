@@ -7,6 +7,7 @@ from app.services.fetcher import fetch_latest_1m_bar
 from app.services.watchlist_manager import WatchlistManager
 from app.config import poll_interval_seconds
 from app.routes.stream import router as streaming_router
+from app.utility import get_time_eastern_timezone,market_open,market_close
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -38,21 +39,28 @@ app.include_router(streaming_router)
 async def market_data_loop():
     while True:
         try:
-            # 1. Refesh watchlist from Data Service
-            symbols = await data_service_client.get_intraday_watchlist()
-            watchlist_manager.update(symbols)
+            # 1. Get the current time
+            now = get_time_eastern_timezone()
 
-            print(watchlist_manager.symbols)
+            # 2. Only run during market hours
+            if now >= market_open and now <= market_close:
 
-            # 2. Fetch and publish latest data bar for each symbol
-            for symbol in watchlist_manager.symbols:
-                bar = await fetch_latest_1m_bar(symbol)
-                if bar:
-                    await publisher.publish(bar)
+                # 3. Refresh watchlist from Data Service every minute
+                symbols = await data_service_client.get_intraday_watchlist()
+                watchlist_manager.update(symbols)
+
+                print(watchlist_manager.symbols)
+
+                # 4. If there are symbols that need serving, fetch and publish the ohlcv data for latest minute candle
+                for symbol in watchlist_manager.symbols:
+                    bar = await fetch_latest_1m_bar(symbol)
+                    if bar:
+                        await publisher.publish(bar)
 
         except Exception as e:
             logger.exception(f"Error in market data loop {e}")
 
+        # 3. Sleep for a minute
         await asyncio.sleep(poll_interval_seconds)
 
 if __name__ == "__main__":

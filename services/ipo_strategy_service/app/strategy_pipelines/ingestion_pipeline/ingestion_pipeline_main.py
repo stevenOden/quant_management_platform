@@ -17,18 +17,18 @@ async def run_ipo_ingestion_pipeline():
     raw_data_rows = await scraper.fetch()
 
     ## DEBUG
-    # raw_data_rows = [{
-    #     "ipo_date": "Jan 02, 2026",
-    #     "symbol": "PLAY",
-    #     "company_name": "Dave and Busters",
-    #     "exchange": "NASDAQ",
-    #     "price_range": "$10.00",
-    #     "shares_offered": "10M",
-    #     "deal_size": "$10M",
-    #     "market_cap": "$100M",
-    #     "revenue": "100M",
-    #     "raw": ""
-    # }]
+    raw_data_rows = [{
+        "ipo_date": "Feb 01, 2026",
+        "symbol": "PLAY",
+        "company_name": "Dave and Busters",
+        "exchange": "NASDAQ",
+        "price_range": "$10.00",
+        "shares_offered": "10M",
+        "deal_size": "$10M",
+        "market_cap": "$100M",
+        "revenue": "100M",
+        "raw": ""
+    }]
     ## END DEBUG
 
     normalized = []
@@ -42,4 +42,3 @@ async def run_ipo_ingestion_pipeline():
 
     # 3. Upsert (Update existing row data / insert new row)
     upsert_ipo_events(normalized)
-    logger.info("IPO Ingestion Pipeline Completed")

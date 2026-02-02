@@ -66,5 +66,7 @@ class ExitEvaluationEngine:
             if not intraday_watch:
                 logging.warning(f"{symbol} could not be removed from the intraday watchlist")
 
+            # TODO 7. Remove symbol/strategy from symbol universe
+
             session.add(ipo_event)
             session.commit()
