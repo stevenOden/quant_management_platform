@@ -18,6 +18,16 @@ class DataServiceClient:
             response.raise_for_status()
             return SymbolResponse(**response.json())
 
+    async def deactivate_symbol(self, symbol: str, source: str = "ipo_strategy") -> SymbolResponse:
+        async with httpx.AsyncClient() as client:
+            response = await client.delete(
+                f"{self.base_url}/universe/symbols",
+                params={"symbol":symbol, "source":source},
+                timeout=10.0
+            )
+            response.raise_for_status()
+            return SymbolResponse(**response.json())
+
     async def get_daily_ohlcv_data(self, symbol: str, date: date) -> DailyOHLCVResponse | None:
         url = f"{self.base_url}/daily/{symbol}/{date.isoformat()}"
         async with httpx.AsyncClient() as client:

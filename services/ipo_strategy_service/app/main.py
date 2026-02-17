@@ -109,3 +109,4 @@ if __name__ == "__main__":
     # asyncio.run(run_ipo_day_pipeline()) # evaluates if the symbols hit ipo date and then records the highest close
     # asyncio.run(run_entry_evaluation_pipeline()) # evaluates the close price and then submits trade order
     # asyncio.run(run_buy_signal_pipeline())
+    # asyncio.run(run_exit_evaluation_pipeline())

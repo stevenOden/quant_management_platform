@@ -16,6 +16,10 @@ execution_service_client = ExecutionServiceClient()
 
 async def run_buy_signal_pipeline():
     today = get_today_eastern_timezone()
+    # DEBUG
+    # from datetime import timedelta
+    # today = today + timedelta(days=1)
+    # END_DEBUG
     logger.info(f"Buy Signal pipeline started for {today}")
     with Session(engine) as session:
 

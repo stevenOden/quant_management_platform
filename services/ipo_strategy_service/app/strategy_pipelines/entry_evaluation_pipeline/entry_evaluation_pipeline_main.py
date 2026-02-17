@@ -35,8 +35,8 @@ async def run_entry_evaluation_pipeline():
                     ohlcv_data = await data_service_client.get_daily_ohlcv_data(event.symbol,event.ipo_date.date())
 
                     ## DEBUG
-                    from datetime import timedelta
-                    ohlcv_data = await data_service_client.get_daily_ohlcv_data(event.symbol, today - timedelta(days = 4))
+                    # from datetime import timedelta
+                    # ohlcv_data = await data_service_client.get_daily_ohlcv_data(event.symbol, today - timedelta(days = 3))
                     ## DEBUG
 
                     if ohlcv_data is not None:
@@ -65,7 +65,8 @@ async def run_entry_evaluation_pipeline():
         for event in ready_events:
             try:
                 ## DEBUG
-                today = today + timedelta(days=1)
+                # from datetime import timedelta
+                # today = today + timedelta(days=1)
                 ## END_DEBUG
 
                 # 1. If the symbol is ready and today is not it's ipo day and buy criteria are met

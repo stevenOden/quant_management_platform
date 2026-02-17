@@ -43,7 +43,10 @@ async def market_data_loop():
             now = get_time_eastern_timezone()
 
             # 2. Only run during market hours
-            if now >= market_open and now <= market_close:
+            # DEBUG
+            if True:
+            # END_DEBUG
+            # if now >= market_open and now <= market_close: # UNCOMMENT THIS END_DEBUG
 
                 # 3. Refresh watchlist from Data Service every minute
                 symbols = await data_service_client.get_intraday_watchlist()

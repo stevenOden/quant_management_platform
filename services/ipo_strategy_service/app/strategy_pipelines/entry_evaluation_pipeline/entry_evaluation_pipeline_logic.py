@@ -21,10 +21,13 @@ async def transition_to_buy_signal(event: IPOEvent, today: date) -> bool:
     '''Transition from State READY -> BUY_SIGNAL if today's closing price is all-time high'''
     if event.state == IPOState.READY and today > event.ipo_date.date() and get_time_eastern_timezone() >= market_close:
         ohlcv_data = await data_service_client.get_daily_ohlcv_data(event.symbol,today)
+        ## DEBUG
+        # from datetime import timedelta
+        # ohlcv_data = await data_service_client.get_daily_ohlcv_data(event.symbol, today - timedelta(days=4))
+        ## END_DEBUG
 
         ## DEBUG
-        ohlcv_data.close += 10
-
+        # ohlcv_data.close += 10
         ## END_DEBUG
         if ohlcv_data.close > event.highest_close:
             return True
