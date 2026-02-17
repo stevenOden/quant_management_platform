@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 eastern_time_zone = ZoneInfo("America/New_York")
 
 market_close = datetime.now(eastern_time_zone).replace(hour=16, minute=0, second=0, microsecond=0) # market close is 4pm Eastern
+market_close_delayed = datetime.now(eastern_time_zone).replace(hour=16, minute=10, second=0, microsecond=0) # market close is 4pm Eastern
 market_close_plus1 = market_close + timedelta(hours=1)
 market_open = datetime.now(eastern_time_zone).replace(hour=9, minute=0, second=0, microsecond=0) # market open is 9 am Eastern
 market_open_plus1 = market_open + timedelta(hours=1)

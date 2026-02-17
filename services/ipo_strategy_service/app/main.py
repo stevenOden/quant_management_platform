@@ -14,7 +14,7 @@ from app.strategy_pipelines.ipo_day_pipeline.ipo_day_pipeline_main import run_ip
 from app.strategy_pipelines.universe_pipeline.universe_pipeline_main import run_universe_pipeline
 from app.strategy_pipelines.entry_evaluation_pipeline.entry_evaluation_pipeline_main import run_entry_evaluation_pipeline
 from app.strategy_pipelines.exit_evaluation_pipeline.exit_evaluation_main import run_exit_evaluation_pipeline
-from app.utility import market_close, market_close_plus1, market_open, market_open_plus1, get_time_eastern_timezone, tomorrow_open
+from app.utility import market_close, market_close_delayed, market_close_plus1, market_open, market_open_plus1, get_time_eastern_timezone, tomorrow_open
 
 root = logging.getLogger()
 for handler in root.handlers:
@@ -55,7 +55,7 @@ async def entry_loop():
                 logger.info("Buy Signal pipeline completed")
 
             # 2. In the hour after market close, run the entry evaluation pipeline
-            elif now >= market_close and now < market_close_plus1:
+            elif now >= market_close_delayed and now < market_close_plus1:
                 await run_entry_evaluation_pipeline()
                 logger.info("Entry Evaluation pipeline completed")
 
@@ -71,8 +71,8 @@ async def entry_loop():
             logger.exception(f"Error in Entry Loop: {e}")
 
         # sleep 1 hour
-        logger.info("Entry Loop Sleeping for 1 hour")
-        await asyncio.sleep(3600)
+        logger.info("Entry Loop Sleeping for 30 minutes")
+        await asyncio.sleep(1800)
 
 async def exit_loop():
     '''Evaluate Exit Evaluation Pipeline continuously during market hours'''
@@ -104,7 +104,7 @@ async def health():
 if __name__ == "__main__":
     import asyncio
     create_db_and_tables()
-    # asyncio.run(run_ipo_ingestion_pipeline()) # get new ipos from web
+    asyncio.run(run_ipo_ingestion_pipeline()) # get new ipos from web
     # asyncio.run(run_universe_pipeline()) # adds new ipos to symbol universe
     # asyncio.run(run_ipo_day_pipeline()) # evaluates if the symbols hit ipo date and then records the highest close
     # asyncio.run(run_entry_evaluation_pipeline()) # evaluates the close price and then submits trade order
