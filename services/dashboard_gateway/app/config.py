@@ -1,0 +1,5 @@
+DATA_SERVICE_URL = "http://localhost:8001"
+PORTFOLIO_SERVICE_URL = "http://localhost:8002"
+EXECUTION_SERVICE_URL = "http://localhost:8003"
+INTRADAY_DATA_SERVICE_URL = "http://localhost:8004"
+IPO_STRATEGY_URL = "http://localhost:8010"

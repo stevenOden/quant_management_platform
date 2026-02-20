@@ -4,6 +4,7 @@ run_configurations.txt
 .idea/
 *.idea/
 *.db
+*TODO.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
