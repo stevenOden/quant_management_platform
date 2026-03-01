@@ -4,8 +4,11 @@ from app.models.ipo_event import IPOEvent
 from datetime import datetime, timezone
 from app.enums.ipo_state import IPOState
 from app.db import engine
+import logging
 
 data_service_client = DataServiceClient()
+
+logger = logging.getLogger(__name__)
 
 async def run_universe_pipeline():
     with Session(engine) as session:
@@ -18,5 +21,6 @@ async def run_universe_pipeline():
             ipo.watching_since = datetime.now(timezone.utc)
 
             session.add(ipo)
+            logger.info(f"{ipo.symbol} Added to Data Service Symbol Universe.")
 
         session.commit()

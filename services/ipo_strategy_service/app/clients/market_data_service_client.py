@@ -10,11 +10,15 @@ class MarketDataServiceClient:
 
     async def stream_prices(self) -> AsyncIterator[Dict]:
         '''
+
+        Serves intraday price data for symbols in the intraday watchlist
+
         Yields Dicts like:
         {
             "symbol": "ABCD",
             "price": 12.34,
             "timestamp": "2026-01-01T15:30:00Z"
+
         '''
 
         async with httpx.AsyncClient(timeout=None) as client:

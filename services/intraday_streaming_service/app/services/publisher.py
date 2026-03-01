@@ -18,13 +18,6 @@ class MarketDataPublisher(ABC):
     async def publish(self, bar: IntradayBar) -> None:
         ...
 
-class LoggingMarketDataPublisher(MarketDataPublisher):
-    async def publish(self, bar: IntradayBar):
-        logger.info(
-            f"Publish IntradayBar: {bar.symbol} @ {bar.timestamp} "
-            f"o={bar.open} h={bar.high} l={bar.low} c={bar.close} v={bar.volume}"
-        )
-
 class StreamingMarketDataPublisher(MarketDataPublisher):
     async def publish(self, bar: IntradayBar):
         for q in list(self.subscribers):

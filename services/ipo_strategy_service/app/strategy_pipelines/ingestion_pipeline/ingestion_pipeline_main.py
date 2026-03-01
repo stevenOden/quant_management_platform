@@ -18,7 +18,7 @@ async def run_ipo_ingestion_pipeline():
 
     ## DEBUG
     # raw_data_rows = [{
-    #     "ipo_date": "Jan 02, 2026",
+    #     "ipo_date": "Feb 16, 2026",
     #     "symbol": "PLAY",
     #     "company_name": "Dave and Busters",
     #     "exchange": "NASDAQ",
@@ -42,4 +42,3 @@ async def run_ipo_ingestion_pipeline():
 
     # 3. Upsert (Update existing row data / insert new row)
     upsert_ipo_events(normalized)
-    logger.info("IPO Ingestion Pipeline Completed")

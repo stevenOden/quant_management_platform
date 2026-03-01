@@ -7,8 +7,8 @@ def parse_date(value: str) -> Optional[datetime.date]:
 
     try:
         date_obj = datetime.strptime(value,"%b %d, %Y").date()
-        utctime = datetime(date_obj.year, date_obj.month, date_obj.day, tzinfo=timezone.utc)
-        return utctime
+        dtime = datetime(date_obj.year, date_obj.month, date_obj.day)
+        return dtime
     except Exception as e:
         print(f"Cannot parse date: {value}: {e}")
 
