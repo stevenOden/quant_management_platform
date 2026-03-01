@@ -1,4 +1,7 @@
 from fastapi import APIRouter, Depends
+
+from app.schemas.daily_value import DailyValue
+from app.schemas.intraday_value import IntradayValue
 from app.schemas.portfolio_overview import PortfolioOverview
 from app.schemas.position import Position
 from app.clients.portfolio_client import PortfolioClient
@@ -8,7 +11,17 @@ router = APIRouter()
 @router.get("/overview", response_model=PortfolioOverview)
 async def get_portfolio_overview(client: PortfolioClient = Depends()):
     data = await client.fetch_overview()
-    return PortfolioOverview
+    return data
+
+@router.get("/daily_pnl", response_model=list[DailyValue])
+async def get_daily_pnl(client: PortfolioClient = Depends()):
+    data = await client.fetch_daily_pnl()
+    return data
+
+@router.get("/intraday_pnl", response_model=list[IntradayValue])
+async def get_daily_pnl(client: PortfolioClient = Depends()):
+    data = await client.fetch_intraday_pnl()
+    return data
 
 @router.get("/positions", response_model=list[Position])
 async def get_positions(client: PortfolioClient = Depends()):

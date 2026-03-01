@@ -7,9 +7,18 @@ api_router.include_router(portfolio.router, prefix="/portfolio", tags=["portfoli
 api_router.include_router(trade_history.router, prefix="/trades", tags=["trades"])
 api_router.include_router(strategy.router, prefix="/strategy", tags=["strategy"])
 api_router.include_router(websocket.router, tags=["websocket"])
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Dashboard Gateway")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 app.include_router(api_router)
+
 
 if __name__ == "__main__":
     import uvicorn
