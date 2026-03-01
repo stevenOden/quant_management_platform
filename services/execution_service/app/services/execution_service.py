@@ -36,6 +36,7 @@ async def execute_trade(trade_in, session: Session):
     async with httpx.AsyncClient() as client: # TODO UPDATE THIS TO USE STREAM
         # a. Fetch the current price
         response = await client.post(f"{DATA_SERVICE_URL}/prices/{symbol}/fetch")
+        response.raise_for_status()
         latest_price = response.json()["price"]
 
     # 3. Create trade record

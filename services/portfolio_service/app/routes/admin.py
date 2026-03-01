@@ -4,6 +4,8 @@ import httpx
 
 from app.db import engine
 from app.models.position import Position
+from app.models.cash_balance import CashBalance
+from app.models.cash_balance_events import CashBalanceEvents
 from app.routes.portfolio import update_position_from_trade
 from app.schemas.position import TradeUpdate
 
@@ -31,12 +33,14 @@ async def resync_portfolio():
     # 2. Clear current Positions Table
     with Session(engine) as session:
         session.exec(delete(Position))
+        session.exec(delete(CashBalance))
+        session.exec(delete(CashBalanceEvents))
         session.commit()
 
         # 3. Replay trades in chronological order and rebuild Positions table
         for trade in trades:
             trade_obj = TradeUpdate(**trade)
-            update_position_from_trade(trade_obj, session)
+            await update_position_from_trade(session, trade_obj)
 
         session.commit()
 

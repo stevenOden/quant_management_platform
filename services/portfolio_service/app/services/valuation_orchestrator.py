@@ -7,10 +7,7 @@ from fastapi import FastAPI
 from app.utility import get_time_eastern_timezone
 from app.services.positions_engine import get_all_positions, get_cash_balance, get_portfolio_summary
 from app.services.pnl_engine import (
-    compute_unrealized_pnl,
     get_cumulative_realized_pnl,
-    compute_total_pnl,
-    compute_portfolio_value,
     write_current_snapshot,
     write_intraday_snapshot_if_needed,
     write_daily_snapshot_if_needed,
@@ -19,9 +16,10 @@ from app.services.pnl_engine import (
 app = FastAPI()
 
 VALUATION_INTERVAL_SECONDS = 300  # or 60, or 300, etc.
-last_daily_update = None
+
 
 async def valuation_loop():
+    last_daily_update = None
     with Session(engine) as session:
         while True:
             now = get_time_eastern_timezone()

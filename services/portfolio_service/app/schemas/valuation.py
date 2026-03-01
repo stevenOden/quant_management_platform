@@ -13,3 +13,6 @@ class PortfolioSummary(SQLModel):
     total_market_value:float
     total_unrealized_pnl:float # Should this also track realized pnl
     positions: List[PositionValuation]
+
+class CashBalance(SQLModel):
+    amount: float

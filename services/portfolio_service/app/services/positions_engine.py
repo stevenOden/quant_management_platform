@@ -46,9 +46,9 @@ async def update_cash_balance(session:Session, trade) -> float:
         symbol=trade.symbol,
         quantity=trade.quantity,
         execution_price=trade.price,
-        pnl_before=cash.amount,
-        pnl_delta=trade_value,
-        pnl_after=cash_after,
+        cash_before=cash.amount,
+        cash_delta=trade_value,
+        cash_after=cash_after,
         trade_id=trade.trade_id
     )
     session.add(event)
@@ -58,6 +58,14 @@ async def update_cash_balance(session:Session, trade) -> float:
 
     return cash.amount
 
+async def get_realized_pnl(session:Session) -> float:
+    current_pnl = session.exec(select(RealizedPnl)).one_or_none()
+    if current_pnl is None:
+        current_pnl = RealizedPnl(id=1, amount=0)
+        session.add(current_pnl)
+        session.commit()
+
+    return current_pnl.amount
 
 async def update_realized_pnl(session:Session, trade, trade_pnl) -> float:
     current_pnl = session.exec(select(RealizedPnl)).one_or_none()
@@ -71,7 +79,7 @@ async def update_realized_pnl(session:Session, trade, trade_pnl) -> float:
         symbol=trade.symbol,
         quantity=trade.quantity,
         execution_price=trade.price,
-        pnl_before=current_pnl,
+        pnl_before=current_pnl.amount,
         pnl_delta=trade_pnl,
         pnl_after=pnl_after,
         trade_id=trade.trade_id
@@ -105,7 +113,7 @@ async def update_position_from_trade(session:Session, trade:TradeUpdate) -> Posi
                 average_cost=price
             )
             # Update the cash balance to reflect the cost to execute buy order
-            current_cash_value = update_cash_balance(session,trade)
+            current_cash_value = await update_cash_balance(session,trade)
         else:
             raise HTTPException(status_code=400, detail="Cannot SELL a non-existant position")
 
@@ -118,7 +126,7 @@ async def update_position_from_trade(session:Session, trade:TradeUpdate) -> Posi
             position.average_cost = new_value / new_quantity
             position.quantity = new_quantity
             # Update the cash balance to reflect the cost to execute buy order
-            current_cash_value = update_cash_balance(session, trade)
+            current_cash_value = await update_cash_balance(session, trade)
 
         elif side == "SELL":
             new_quantity = position.quantity - qty
@@ -129,6 +137,7 @@ async def update_position_from_trade(session:Session, trade:TradeUpdate) -> Posi
             elif new_quantity < 0:
                 raise HTTPException(status_code=400, detail="Cannot SELL more than the current position quantity")
             current_pnl = await update_realized_pnl(session,trade,realized_pnl)
+            current_cash_value = await update_cash_balance(session, trade)
         else:
             raise HTTPException(status_code=400, detail="Unexpected side type")
 
@@ -140,7 +149,7 @@ async def update_position_from_trade(session:Session, trade:TradeUpdate) -> Posi
     return position
 
 async def get_portfolio_summary(session):
-    positions = get_all_positions(session)
+    positions = await get_all_positions(session)
 
     valuations = []
     total_mv = 0
