@@ -95,6 +95,7 @@ async def write_intraday_snapshot_if_needed(
     timestamp = floor_to_5m(timestamp)
     snapshot = session.exec(select(IntradayPnl).where(IntradayPnl.timestamp==timestamp)).one_or_none()
     if snapshot:
+        snapshot.timestamp = timestamp
         snapshot.realized_pnl = realized
         snapshot.unrealized_pnl = unrealized
         snapshot.total_pnl = total

@@ -102,9 +102,18 @@ async def health():
     return {"status": "ok"}
 
 if __name__ == "__main__":
-    import asyncio
-    create_db_and_tables()
-    asyncio.run(run_ipo_ingestion_pipeline()) # get new ipos from web
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host="127.0.0.1",
+        port=8010,
+        reload=True,
+        log_level="debug",
+    )
+
+    # import asyncio
+    # create_db_and_tables()
+    # asyncio.run(run_ipo_ingestion_pipeline()) # get new ipos from web
     # asyncio.run(run_universe_pipeline()) # adds new ipos to symbol universe
     # asyncio.run(run_ipo_day_pipeline()) # evaluates if the symbols hit ipo date and then records the highest close
     # asyncio.run(run_entry_evaluation_pipeline()) # evaluates the close price and then submits trade order

@@ -1,10 +1,17 @@
 import time
-import logging
+import logging.config
+import yaml
+from pathlib import Path
 from app.fetchers.fetcher import trigger_data_service_fetch, trigger_data_service_ohlcv_fetch
-from app.clients.data_service_client import get_symbols_from_universe
+from app.clients.data_service_client import get_symbols_from_universe, get_health_status
 from app.config import FETCH_INTERVAL_SECONDS
 from requests.exceptions import HTTPError
 from app.utility import get_today_eastern_timezone, get_time_eastern_timezone, market_close, tomorrow_close
+
+config_path = Path(__file__).parent / "logging.yaml"
+with config_path.open("r") as fin:
+    config = yaml.safe_load(fin)
+    logging.config.dictConfig(config)
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +26,10 @@ def run_daily_scheduler():
         today = today - timedelta(days=5)
         ## END_DABUG
         now = get_time_eastern_timezone()
+
+        # Add retry loop to wait for data service to be up
+        if not last_ingest_date:
+            get_health_status()
 
         # If it's past EOD and we haven't ingested today
         if now >= market_close and last_ingest_date != now.date():

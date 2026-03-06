@@ -30,5 +30,4 @@ async def run_ipo_day_pipeline():
             except Exception:
                 logger.exception(f"Error processing state machine for {event.symbol}")
 
-            session.add(event)
             session.commit()

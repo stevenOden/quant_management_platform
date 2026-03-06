@@ -4,6 +4,8 @@ from app.enums.ipo_state import IPOState
 from app.models.ipo_event import IPOEvent
 import logging
 
+from app.utility import get_today_eastern_timezone
+
 logger = logging.getLogger(__name__)
 
 def upsert_ipo_events(events):
@@ -30,10 +32,16 @@ def upsert_ipo_events(events):
                         print(f"Updating {key} for symbol {event["symbol"]} from {existing_value} to {value}")
                     setattr(existing, key, value)
                 if different:
-                    existing_state = getattr(existing, 'state')
-                    setattr(existing, 'state', IPOState.DISCOVERED) # if the data was changed, reset to discovered to start strategy over
-                    logger.info(f"Updating state for symbol {event["symbol"]} from {existing_state} to DISCOVERED")
-                    print(f"Updating state for symbol {event["symbol"]} from {existing_state} to DISCOVERED")
+                    # Ignore changes if today is still the ipo_day (market cap is updated constantly as the stock ipos)
+                    if existing.ipo_date.date() != get_today_eastern_timezone():
+                        existing_state = getattr(existing, 'state')
+                        setattr(existing, 'state', IPOState.DISCOVERED) # if the data was changed, reset to discovered to start strategy over
+                        logger.info(f"Updating state for symbol {event["symbol"]} from {existing_state} to DISCOVERED")
+                        print(f"Updating state for symbol {event["symbol"]} from {existing_state} to DISCOVERED")
+                        session.add(existing)
+                    else:
+                        logger.info(f"Today is ipo day, ignoring changes")
+                        print(f"Today is ipo day, ignoring changes")
             else:
                 new_event = IPOEvent(**event)
                 session.add(new_event)
