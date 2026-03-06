@@ -41,6 +41,11 @@ class ExitEvaluationEngine:
             # 3. Evaluate the exit logic with the data subset and streamed price
             exit_signal = self.exit_logic.should_exit(holding_data,price)
             if not exit_signal:
+                # update current pnl
+                current_value = price * ipo_event.position_num_share
+                ipo_event.position_pnl = current_value - ipo_event.position_entry_value
+                session.add(ipo_event)
+                session.commit()
                 return
 
             # 4. If exit logic is valid, execute a sell order through the execution client connection
@@ -59,7 +64,8 @@ class ExitEvaluationEngine:
             ipo_event.exit_price = execution_result.price # good for finding slippage
             ipo_event.exited_at = execution_result.timestamp
             ipo_event.state = IPOState.EXITED
-            ipo_event.position_pnl = ipo_event.entry_price - ipo_event.exit_price
+            ipo_event.position_exit_value = ipo_event.position_num_share * price
+            ipo_event.position_pnl = ipo_event.position_exit_value - ipo_event.position_entry_value
 
             # 6. Update the IntradayWatchlist to remove this symbol/strategy row
             intraday_watch = await data_service_client.remove_intraday_watchlist_symbol(symbol)

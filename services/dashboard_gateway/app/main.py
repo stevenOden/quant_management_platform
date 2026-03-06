@@ -1,11 +1,11 @@
 from fastapi import FastAPI, APIRouter
-from app.routes import portfolio, trade_history, strategy, websocket
+from app.routes import portfolio, trade_history, ipo_strategy, websocket
 
 api_router = APIRouter()
 
 api_router.include_router(portfolio.router, prefix="/portfolio", tags=["portfolio"])
 api_router.include_router(trade_history.router, prefix="/trades", tags=["trades"])
-api_router.include_router(strategy.router, prefix="/strategy", tags=["strategy"])
+api_router.include_router(ipo_strategy.router, prefix="/ipo_strategy", tags=["strategy"])
 api_router.include_router(websocket.router, tags=["websocket"])
 from fastapi.middleware.cors import CORSMiddleware
 

@@ -32,4 +32,6 @@ class IPOEventResponse(SQLModel):
 
     # Position Size
     position_num_share: float | None
+    position_entry_value: float | None
+    position_exit_value: float | None
     position_pnl: float | None
