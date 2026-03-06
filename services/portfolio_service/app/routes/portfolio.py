@@ -4,11 +4,10 @@ from ..db import get_session
 from ..models.position import Position
 from ..schemas.position import PositionCreate, PositionRead, TradeUpdate
 from ..schemas.valuation import PositionValuation, PortfolioSummary
+from app.services.positions_engine import get_all_positions, get_portfolio_summary, update_position_from_trade
 import httpx
 
 router = APIRouter(prefix="/portfolio", tags =["portfolio"])
-
-DATA_SERVICE_URL = "http://localhost:8001/prices"
 
 @router.post("/positions", response_model=PositionRead)
 def add_position(position: PositionCreate, session: Session = Depends(get_session)):
@@ -20,44 +19,11 @@ def add_position(position: PositionCreate, session: Session = Depends(get_sessio
 
 @router.get("/", response_model=PortfolioSummary)
 async def get_portfolio(session: Session = Depends(get_session)):
-    positions = session.exec(select(Position)).all()
-
-    valuations = []
-    total_mv = 0
-    total_unrealized_pnl = 0
-
-    async with httpx.AsyncClient() as client: # create single async http client
-        for pos in positions:
-            r = await client.post(f"{DATA_SERVICE_URL}/{pos.symbol}/fetch")
-            latest_price = r.json()["price"]
-
-            mv = pos.quantity * latest_price
-            pnl = (latest_price - pos.average_cost) * pos.quantity
-
-            total_mv += mv
-            total_unrealized_pnl += pnl
-
-            valuations.append(
-                PositionValuation(
-                    symbol=pos.symbol,
-                    quantity=pos.quantity,
-                    average_cost=pos.average_cost,
-                    latest_price=latest_price,
-                    market_value=mv,
-                    unrealized_pnl=pnl,
-                )
-            )
-
-    return PortfolioSummary(
-        positions=valuations,
-        total_market_value=total_mv,
-        total_unrealized_pnl=total_unrealized_pnl,
-    )
+    return await get_portfolio_summary(session)
 
 @router.get("/positions", response_model=list[PositionRead])
-def read_position(session: Session = Depends(get_session)):
-    positions = session.exec(select(Position)).all()
-    return positions
+async def read_position(session: Session = Depends(get_session)):
+    return await get_all_positions(session)
 
 @router.get("/positions/{symbol}", response_model=PositionRead)
 def read_position(symbol: str, session: Session = Depends(get_session)):
@@ -68,50 +34,5 @@ def read_position(symbol: str, session: Session = Depends(get_session)):
     return position
 
 @router.post("/positions/update", response_model = PositionRead)
-def update_position_from_trade(trade:TradeUpdate, session: Session = Depends(get_session)):
-    position = session.exec(select(Position).where(Position.symbol == trade.symbol.upper())).first()
-
-    # 0. Idempotency check (avoid duplicate portfolio updates)
-    if position and position.last_trade_id == trade.trade_id:
-        return position
-
-    symbol = trade.symbol.upper()
-    qty = trade.quantity
-    price = trade.price
-    side = trade.side.upper()
-
-    if position is None:
-        if side == "BUY":
-            position = Position(
-                symbol=symbol,
-                quantity=qty,
-                average_cost=price
-            )
-        else:
-            raise HTTPException(status_code=400, detail="Cannot SELL a non-existant position")
-
-    else:
-        current_value = position.quantity * position.average_cost
-
-        if side == "BUY":
-            new_value = current_value + qty * price
-            new_quantity = position.quantity + qty
-            position.average_cost = new_value / new_quantity
-            position.quantity = new_quantity
-
-        elif side == "SELL":
-            new_quantity = position.quantity - qty
-            position.quantity = new_quantity
-            if new_quantity == 0:
-                position.average_cost = 0 # reset the cost if position is fully closed
-            elif new_quantity < 0:
-                raise HTTPException(status_code=400, detail="Cannot SELL more than the current position quantity")
-        else:
-            raise HTTPException(status_code=400, detail="Unexpected side type")
-
-    position.last_trade_id = trade.trade_id
-    session.add(position)
-    session.commit()
-    session.refresh(position)
-
-    return position
+async def update_position(trade:TradeUpdate, session: Session = Depends(get_session)):
+    return await update_position_from_trade(session, trade)
