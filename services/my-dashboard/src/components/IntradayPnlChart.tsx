@@ -8,7 +8,16 @@ import {
   CartesianGrid,
 } from 'recharts';
 
-export default function IntradayPnlChart({ data }) {
+type IntradayPnlPoint = {
+  timestamp: string;
+  portfolio_value: number;
+};
+
+type IntradayPnlChartProps = {
+  data: IntradayPnlPoint[];
+};
+
+export default function IntradayPnlChart({ data }: IntradayPnlChartProps) {
     // data is an array of objects with date + total_pnl
   return (
     <ResponsiveContainer width="100%" height={300}>

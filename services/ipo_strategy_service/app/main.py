@@ -2,13 +2,15 @@ from datetime import timedelta
 from math import floor
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-import logging
+import logging.config
 import asyncio
+from pathlib import Path
+import yaml
 
 from app.db import create_db_and_tables
 from app.routes.ipo_events import router as ipo_event_router
 from app.strategy_pipelines.buy_signal_pipeline.buy_signal_pipeline_main import run_buy_signal_pipeline
-
+from app.clients.data_service_client import DataServiceClient
 from app.strategy_pipelines.ingestion_pipeline.ingestion_pipeline_main import run_ipo_ingestion_pipeline
 from app.strategy_pipelines.ipo_day_pipeline.ipo_day_pipeline_main import run_ipo_day_pipeline
 from app.strategy_pipelines.universe_pipeline.universe_pipeline_main import run_universe_pipeline
@@ -16,14 +18,13 @@ from app.strategy_pipelines.entry_evaluation_pipeline.entry_evaluation_pipeline_
 from app.strategy_pipelines.exit_evaluation_pipeline.exit_evaluation_main import run_exit_evaluation_pipeline
 from app.utility import market_close, market_close_delayed, market_close_plus1, market_open, market_open_plus1, get_time_eastern_timezone, tomorrow_open
 
-root = logging.getLogger()
-for handler in root.handlers:
-    handler.setLevel(logging.INFO)
+config_path = Path(__file__).parent / ".." / "logging.yaml"
+with config_path.open("r") as fin:
+    config = yaml.safe_load(fin)
+    logging.config.dictConfig(config)
+
 
 logger = logging.getLogger(__name__)
-
-
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -44,8 +45,15 @@ async def entry_loop():
     Evaluate Buy Signal once after market Open
     '''
     logger.info("Entry Loop started")
+    started = False
     while True:
         try:
+            # 00. Wait for Data Service
+            if not started:
+                data_client = DataServiceClient()
+                await data_client.get_health_status()
+                started = True
+
             # 0. Get the current time in eastern time zone (DST tolerant)
             now = get_time_eastern_timezone()
 

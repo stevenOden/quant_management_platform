@@ -1,13 +1,36 @@
 import httpx
+import logging
+import time
 from datetime import date
 from sqlmodel import Session
 from app.schemas.universe import SymbolResponse, IntradaySymbolResponse
 from app.schemas.daily_ohlcv import DailyOHLCVResponse
 from app.config import DATA_SERVICE_URL
 
+logger = logging.getLogger(__name__)
+
 class DataServiceClient:
     def __init__(self):
         self.base_url = DATA_SERVICE_URL
+
+    async def get_health_status(self):
+        up = False
+        while not up:
+            try:
+                async with httpx.AsyncClient() as client:
+                    response = await client.get(f"{self.base_url}/health")
+                    response.raise_for_status()
+                    if response.status_code == 200:
+                        up = True
+                        logger.info("Data Service is up, proceeding.")
+                    else:
+                        logger.info("Waiting for data service to be up..")
+                        time.sleep(5)
+            except:
+                    logger.info("Waiting for data service to be up..")
+                    time.sleep(5)
+        return True
+
     async def register_symbol(self, symbol: str, source: str = "ipo_strategy") -> SymbolResponse:
         async with httpx.AsyncClient() as client:
             response = await client.post(

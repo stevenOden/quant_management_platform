@@ -1,0 +1,155 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: quant_postgres
+    environment:
+      POSTGRES_USER: steven
+      POSTGRES_PASSWORD: stevenpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U steven"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      
+  data_service:
+    build: ./services/data_service
+    container_name: data_service
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DASHBOARD_GATEWAY_SERVICE_URL: ${DASHBOARD_GATEWAY_SERVICE_URL}
+      DATA_SERVICE_URL: ${DATA_SERVICE_URL}
+      PORTFOLIO_SERVICE_URL: ${PORTFOLIO_SERVICE_URL}
+      EXECUTION_SERVICE_URL: ${EXECUTION_SERVICE_URL}
+      INTRADAY_STREAMING_SERVICE_URL: ${INTRADAY_STREAMING_SERVICE_URL}
+      IPO_STRATEGY_SERVICE_URL: ${IPO_STRATEGY_SERVICE_URL}
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+  portfolio_service:
+    build: ./services/portfolio_service
+    container_name: portfolio_service
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DASHBOARD_GATEWAY_SERVICE_URL: ${DASHBOARD_GATEWAY_SERVICE_URL}
+      DATA_SERVICE_URL: ${DATA_SERVICE_URL}
+      PORTFOLIO_SERVICE_URL: ${PORTFOLIO_SERVICE_URL}
+      EXECUTION_SERVICE_URL: ${EXECUTION_SERVICE_URL}
+      INTRADAY_STREAMING_SERVICE_URL: ${INTRADAY_STREAMING_SERVICE_URL}
+      IPO_STRATEGY_SERVICE_URL: ${IPO_STRATEGY_SERVICE_URL}
+    ports:
+      - "8002:8002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+  execution_service:
+    build: ./services/execution_service
+    container_name: execution_service
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DASHBOARD_GATEWAY_SERVICE_URL: ${DASHBOARD_GATEWAY_SERVICE_URL}
+      DATA_SERVICE_URL: ${DATA_SERVICE_URL}
+      PORTFOLIO_SERVICE_URL: ${PORTFOLIO_SERVICE_URL}
+      EXECUTION_SERVICE_URL: ${EXECUTION_SERVICE_URL}
+      INTRADAY_STREAMING_SERVICE_URL: ${INTRADAY_STREAMING_SERVICE_URL}
+      IPO_STRATEGY_SERVICE_URL: ${IPO_STRATEGY_SERVICE_URL}
+    ports:
+      - "8003:8003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+  ipo_strategy_service:
+    build: ./services/ipo_strategy_service
+    container_name: ipo_strategy_service
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DASHBOARD_GATEWAY_SERVICE_URL: ${DASHBOARD_GATEWAY_SERVICE_URL}
+      DATA_SERVICE_URL: ${DATA_SERVICE_URL}
+      PORTFOLIO_SERVICE_URL: ${PORTFOLIO_SERVICE_URL}
+      EXECUTION_SERVICE_URL: ${EXECUTION_SERVICE_URL}
+      INTRADAY_STREAMING_SERVICE_URL: ${INTRADAY_STREAMING_SERVICE_URL}
+      IPO_STRATEGY_SERVICE_URL: ${IPO_STRATEGY_SERVICE_URL}
+    ports:
+      - "8010:8010"
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+  intraday_streaming_service:
+    build: ./services/intraday_streaming_service
+    container_name: intraday_streaming_service
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DASHBOARD_GATEWAY_SERVICE_URL: ${DASHBOARD_GATEWAY_SERVICE_URL}
+      DATA_SERVICE_URL: ${DATA_SERVICE_URL}
+      PORTFOLIO_SERVICE_URL: ${PORTFOLIO_SERVICE_URL}
+      EXECUTION_SERVICE_URL: ${EXECUTION_SERVICE_URL}
+      INTRADAY_STREAMING_SERVICE_URL: ${INTRADAY_STREAMING_SERVICE_URL}
+      IPO_STRATEGY_SERVICE_URL: ${IPO_STRATEGY_SERVICE_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+  daily_ohlcv_service:
+    build: ./services/daily_ohlcv_service
+    container_name: daily_ohlcv_service
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DASHBOARD_GATEWAY_SERVICE_URL: ${DASHBOARD_GATEWAY_SERVICE_URL}
+      DATA_SERVICE_URL: ${DATA_SERVICE_URL}
+      PORTFOLIO_SERVICE_URL: ${PORTFOLIO_SERVICE_URL}
+      EXECUTION_SERVICE_URL: ${EXECUTION_SERVICE_URL}
+      INTRADAY_STREAMING_SERVICE_URL: ${INTRADAY_STREAMING_SERVICE_URL}
+      IPO_STRATEGY_SERVICE_URL: ${IPO_STRATEGY_SERVICE_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+  dashboard_gateway_service:
+    build: ./services/dashboard_gateway
+    container_name: dashboard_gateway
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DASHBOARD_GATEWAY_SERVICE_URL: ${DASHBOARD_GATEWAY_SERVICE_URL}
+      DATA_SERVICE_URL: ${DATA_SERVICE_URL}
+      PORTFOLIO_SERVICE_URL: ${PORTFOLIO_SERVICE_URL}
+      EXECUTION_SERVICE_URL: ${EXECUTION_SERVICE_URL}
+      INTRADAY_STREAMING_SERVICE_URL: ${INTRADAY_STREAMING_SERVICE_URL}
+      IPO_STRATEGY_SERVICE_URL: ${IPO_STRATEGY_SERVICE_URL}
+    ports:
+      - "8000:8000"
+    healthcheck:
+      #test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+  dashboard:
+    build: 
+      context: ./services/my-dashboard
+      args:
+        DASHBOARD_GATEWAY_SERVICE_URL: ${DASHBOARD_GATEWAY_SERVICE_URL}
+    container_name: dashboard
+    depends_on:
+      dashboard_gateway_service:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+        
+volumes:
+  pgdata:

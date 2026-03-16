@@ -28,16 +28,16 @@ def upsert_ipo_events(events):
                     existing_value = getattr(existing, key)
                     if value != existing_value:
                         different = True
-                        logger.info(f"Updating {key} for symbol {event["symbol"]} from {existing_value} to {value}")
-                        print(f"Updating {key} for symbol {event["symbol"]} from {existing_value} to {value}")
+                        logger.info(f'Updating {key} for symbol {event["symbol"]} from {existing_value} to {value}')
+                        print(f'Updating {key} for symbol {event["symbol"]} from {existing_value} to {value}')
                     setattr(existing, key, value)
                 if different:
                     # Ignore changes if today is still the ipo_day (market cap is updated constantly as the stock ipos)
                     if existing.ipo_date.date() != get_today_eastern_timezone():
                         existing_state = getattr(existing, 'state')
                         setattr(existing, 'state', IPOState.DISCOVERED) # if the data was changed, reset to discovered to start strategy over
-                        logger.info(f"Updating state for symbol {event["symbol"]} from {existing_state} to DISCOVERED")
-                        print(f"Updating state for symbol {event["symbol"]} from {existing_state} to DISCOVERED")
+                        logger.info(f'Updating state for symbol {event["symbol"]} from {existing_state} to DISCOVERED')
+                        print(f'Updating state for symbol {event["symbol"]} from {existing_state} to DISCOVERED')
                         session.add(existing)
                     else:
                         logger.info(f"Today is ipo day, ignoring changes")

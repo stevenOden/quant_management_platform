@@ -1,13 +1,16 @@
 from sqlmodel import SQLModel, create_engine, Session
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+import os
+
 ## DEBUG
 # DATABASE_URL = "sqlite:///./app/ipo_strategy.db"
 DATABASE_URL = "sqlite:///./ipo_strategy.db" # <- Use this when done dubugging
 ## END DEBUG
 
-## Syncronous Engine
+# Postgres connection; DATABASE_URL defined in docker-compose
+DATABASE_URL = os.getenv("DATABASE_URL","sqlite:///./ipo_strategy.db")
+
 engine = create_engine(DATABASE_URL, echo=False)
+
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
 

@@ -5,9 +5,9 @@ from sqlmodel import Session
 from app.models.trade import Trade, SystemState
 from fastapi import HTTPException
 from app.db import engine
+from app.config import DATA_SERVICE_URL,PORTFOLIO_SERVICE_URL
 
-DATA_SERVICE_URL = "http://localhost:8001"
-PORTFOLIO_SERVICE_URL = "http://localhost:8002"
+
 async def execute_trade(trade_in, session: Session):
     symbol = trade_in.symbol.upper()
 

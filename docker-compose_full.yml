@@ -1,0 +1,83 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: quant_postgres
+    environment:
+      POSTGRES_USER: steven
+      POSTGRES_PASSWORD: stevenpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U steven"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  data_service:
+    build: ./data_service
+    environment:
+      DATABASE_URL: postgresql://steven:stevenpassword@postgres:5432/data_service_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  portfolio_service:
+    build: ./portfolio_service
+    environment:
+      DATABASE_URL: postgresql://steven:stevenpassword@postgres:5432/portfolio_service_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  execution_service:
+    build: ./execution_service
+    environment:
+      DATABASE_URL: postgresql://steven:stevenpassword@postgres:5432/execution_service_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+  ipo_strategy_service:
+    build: ./strategy_service
+    environment:
+      DATABASE_URL: postgresql://steven:stevenpassword@postgres:5432/ipo_strategy_service_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+  dashboard_gateway:
+    build: ./dashboard_gateway
+    environment:
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+  dashboard:
+    build: ./my-dashboard
+    environment:
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+  intraday_streaming_service:
+    build: ./intraday_streaming_service
+    environment:
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+  daily_ohlcv_service:
+    build: ./daily_ohlcv_service
+    environment:
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+
+volumes:
+  pgdata:

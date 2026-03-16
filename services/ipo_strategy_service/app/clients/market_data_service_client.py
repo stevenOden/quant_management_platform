@@ -2,11 +2,11 @@ import json
 import httpx
 from typing import AsyncIterator, Dict
 
-from app.config import MARKET_DATA_SERVICE_URL
+from app.config import INTRADAY_STREAMING_SERVICE_URL
 
 class MarketDataServiceClient:
     def __init__(self):
-        self.base_url = MARKET_DATA_SERVICE_URL
+        self.base_url = INTRADAY_STREAMING_SERVICE_URL
 
     async def stream_prices(self) -> AsyncIterator[Dict]:
         '''

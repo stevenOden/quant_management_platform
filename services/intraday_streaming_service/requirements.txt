@@ -1,0 +1,6 @@
+fastapi
+httpx
+PyYAML
+requests
+yfinance
+uvicorn

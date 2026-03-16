@@ -1,6 +1,8 @@
 import asyncio
-import logging
+import logging.config
 from fastapi import FastAPI
+from pathlib import Path
+import yaml
 
 from app.clients.data_service_client import DataServiceClient
 from app.services.fetcher import fetch_latest_1m_bar
@@ -9,8 +11,12 @@ from app.config import poll_interval_seconds
 from app.routes.stream import router as streaming_router
 from app.utility import get_time_eastern_timezone,market_open,market_close
 
+config_path = Path(__file__).parent / ".." / "logging.yaml"
+with config_path.open("r") as fin:
+    config = yaml.safe_load(fin)
+    logging.config.dictConfig(config)
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+
 
 # 0. Initialize Classes
 from app.services.publisher import publisher # Singleton created in file to avoid circular import with routes/stream

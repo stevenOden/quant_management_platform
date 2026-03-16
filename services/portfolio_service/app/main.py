@@ -8,6 +8,15 @@ from app.routes.admin import router as admin_router
 from app.routes.valuation import router as valuation_router
 from app.services.valuation_orchestrator import valuation_loop
 
+import yaml
+from pathlib import Path
+import logging.config
+
+config_path = Path(__file__).parent / ".." / "logging.yaml"
+with config_path.open("r") as fin:
+    config = yaml.safe_load(fin)
+    logging.config.dictConfig(config)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup

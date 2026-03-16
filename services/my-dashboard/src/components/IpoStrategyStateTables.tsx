@@ -154,7 +154,9 @@ export function HoldingTable({ title, rows }: { title: string; rows: StrategySta
         <thead>
           <tr style={{ background: "#242b30", textAlign: "center" ,borderBottom: "2px solid #030303",}}>
             <th style={{ padding: "8px 12px" }}>Symbol</th>
-            <th style={{ padding: "8px 12px" }}>IPO_Date</th>
+            <th style={{ padding: "8px 12px" }}>PnL</th>
+            <th style={{ padding: "8px 12px" }}>Target</th>
+            <th style={{ padding: "8px 12px" }}>Stop</th>
           </tr>
         </thead>
         <tbody>
@@ -185,7 +187,7 @@ export function ExitedTable({ title, rows }: { title: string; rows: StrategyStat
         <thead>
           <tr style={{ background: "#242b30", textAlign: "center" ,borderBottom: "2px solid #030303",}}>
             <th style={{ padding: "8px 12px" }}>Symbol</th>
-            <th style={{ padding: "8px 12px" }}>IPO_Date</th>
+            <th style={{ padding: "8px 12px" }}>PnL</th>
           </tr>
         </thead>
         <tbody>

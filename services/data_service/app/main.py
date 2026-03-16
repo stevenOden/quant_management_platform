@@ -5,6 +5,15 @@ from app.routes.prices import router as price_router
 from app.routes.universe import router as universe_router
 from app.routes.daily_ohlcv import router as daily_ohlcv_router
 from app.routes.intraday_watchlist import router as intraday_watchlist_router
+import yaml
+from pathlib import Path
+import logging.config
+
+config_path = Path(__file__).parent / ".." / "logging.yaml"
+with config_path.open("r") as fin:
+    config = yaml.safe_load(fin)
+    logging.config.dictConfig(config)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

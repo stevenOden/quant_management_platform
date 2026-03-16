@@ -1,2 +1,4 @@
+fastapi
+httpx
+PyYAML
 requests
-python-dotenv

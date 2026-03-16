@@ -1,6 +1,4 @@
-from datetime import timezone
 import yfinance as yf
-from pyarrow import timestamp
 
 from app.models.intraday_bar import IntradayBar
 

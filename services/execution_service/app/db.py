@@ -1,7 +1,9 @@
 from sqlmodel import SQLModel, Session, create_engine
 from app.models.trade import SystemState
+import os
 
-DATABASE_URL = "sqlite:///./execution.db"
+DATABASE_URL = os.getenv("DATABASE_URL","sqlite:///./execution.db")
+
 engine = create_engine(DATABASE_URL, echo=False)
 
 def create_db_and_tables():

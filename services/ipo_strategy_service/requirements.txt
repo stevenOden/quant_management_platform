@@ -2,6 +2,6 @@ fastapi
 uvicorn
 sqlmodel
 psycopg2-binary
-yfinance
 httpx
+bs4
 PyYAML

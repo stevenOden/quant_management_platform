@@ -8,10 +8,9 @@ from app.models.cash_balance import CashBalance
 from app.models.cash_balance_events import CashBalanceEvents
 from app.routes.portfolio import update_position_from_trade
 from app.schemas.position import TradeUpdate
+from app.config import EXECUTION_SERVICE_URL
 
 router = APIRouter(prefix="/admin", tags =["admin"])
-
-EXECUTION_SERVICE_URL = "http://localhost:8003/execute"
 
 @router.post("/resync")
 async def resync_portfolio():

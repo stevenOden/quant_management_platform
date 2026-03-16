@@ -1,0 +1,4 @@
+CREATE DATABASE data_service_db;
+CREATE DATABASE portfolio_service_db;
+CREATE DATABASE execution_service_db;
+CREATE DATABASE ipo_strategy_service_db;
