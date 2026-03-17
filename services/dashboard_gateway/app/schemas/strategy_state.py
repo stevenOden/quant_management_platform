@@ -13,6 +13,7 @@ class StrategyState(BaseModel):
     pnl: float | None
     pnl_percent: float | None
     last_evaluated: datetime | None
+    current_price: float | None
 
 class IPOStateResponse(BaseModel):
     DISCOVERED: list[StrategyState]

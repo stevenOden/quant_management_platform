@@ -3,7 +3,6 @@ export interface StrategyState {
   strategy: string;
   state: string;
   ipo_date: string;
-  //price: number | null
   entry_price: number | null;
   entry_value: number | null;
   target_price: number | null;
@@ -11,6 +10,7 @@ export interface StrategyState {
   pnl: number | null;
   pnl_percent: number | null;
   last_evaluated: string | null;
+  current_price: number | null;
 }
 
 export interface IPOStateResponse {

@@ -35,3 +35,5 @@ class IPOEventResponse(SQLModel):
     position_entry_value: float | None
     position_exit_value: float | None
     position_pnl: float | None
+
+    current_price : float | None

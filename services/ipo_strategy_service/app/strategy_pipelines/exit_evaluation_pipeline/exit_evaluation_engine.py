@@ -40,6 +40,7 @@ class ExitEvaluationEngine:
 
             # 3. Evaluate the exit logic with the data subset and streamed price
             exit_signal = self.exit_logic.should_exit(holding_data,price)
+            ipo_event.current_price = round(price,2)
             if not exit_signal:
                 # update current pnl
                 current_value = price * ipo_event.position_num_share

@@ -34,6 +34,7 @@ async def get_ipo_event_data(client: IPOStrategyClient = Depends()):
                 pnl = ipo['position_pnl'],
                 pnl_percent = round(ipo['position_pnl']/ipo['position_entry_value'] * 100,2) if ipo['position_pnl'] else 0.0,
                 last_evaluated = ipo['last_signal_at'],
+                current_price = ipo['current_price'] if ipo['current_price'] else 0.00
             )
         )
     return output

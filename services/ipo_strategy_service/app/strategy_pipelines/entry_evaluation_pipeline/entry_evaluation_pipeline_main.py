@@ -69,6 +69,29 @@ async def run_entry_evaluation_pipeline():
                 # today = today + timedelta(days=1)
                 ## END_DEBUG
 
+                # 0. We can only hold up to 20 poistions at one time, prioritized by market cap
+                # TODO: How do should we handle market cap prioritization? Do we initiate a sell on a loser to add this new one?
+                holding_events = session.exec(select(IPOEvent).where(IPOEvent.state == IPOState.HOLDING)).all()
+                if len(holding_events) == 20:
+                    logger.info(f"Holding 20 Positions. Cannot move {event.symbol} to BUY_SIGNAL")
+                    # If we already have 20, keep the event in ready, if it hit its theoretical stop loss or take profit, move to missed
+                    current_price = await data_service_client.get_current_price(event.symbol)
+                    target_gain_pct = 20.0
+                    target_price = (target_gain_pct + 100) / 100 * event.highest_close
+                    stop_loss_pct = 10.0
+                    stop_loss_price = (100 - stop_loss_pct) / 100 * event.highest_close
+
+                    if current_price >= target_price:
+                        logger.info(f"{event.symbol} hit profit target price. Moving to MISSED")
+                        event.state = IPOState.MISSED
+                        session.add(event)
+                        continue
+                    elif current_price <= stop_loss_price:
+                        logger.info(f"{event.symbol} hit stop loss price. Moving to MISSED")
+                        event.state = IPOState.MISSED
+                        session.add(event)
+                        continue
+
                 # 1. If the symbol is ready and today is not it's ipo day and buy criteria are met
                 if await transition_to_buy_signal(event,today):
                     logger.info(f"{event.symbol}: READY -> BUY_SIGNAL")

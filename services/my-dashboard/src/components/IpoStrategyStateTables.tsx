@@ -155,6 +155,7 @@ export function HoldingTable({ title, rows }: { title: string; rows: StrategySta
           <tr style={{ background: "#242b30", textAlign: "center" ,borderBottom: "2px solid #030303",}}>
             <th style={{ padding: "8px 12px" }}>Symbol</th>
             <th style={{ padding: "8px 12px" }}>PnL</th>
+            <th style={{ padding: "8px 12px" }}>Price</th>
             <th style={{ padding: "8px 12px" }}>Target</th>
             <th style={{ padding: "8px 12px" }}>Stop</th>
           </tr>
@@ -169,6 +170,7 @@ export function HoldingTable({ title, rows }: { title: string; rows: StrategySta
               }}>
               <td>{row.symbol}</td>
               <td>{row.pnl_percent}</td>
+              <td>{row.current_price}</td>
               <td>{row.target_price}</td>
               <td>{row.stop_loss}</td>
             </tr>

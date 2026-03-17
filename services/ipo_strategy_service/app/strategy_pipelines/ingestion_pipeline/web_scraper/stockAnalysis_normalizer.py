@@ -75,6 +75,10 @@ def parse_price_range(value: Optional[str]) -> (Optional[float], Optional[float]
 def normalize_stockanalysis_row(raw_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
     company_name = raw_data.get("company_name","").strip()
+    # Ignore acquisition companies, they don't do anything
+    if "acquisition" in company_name.lower():
+        return None
+
     ipo_date_raw = raw_data.get("ipo_date", "").strip()
 
     if not company_name:

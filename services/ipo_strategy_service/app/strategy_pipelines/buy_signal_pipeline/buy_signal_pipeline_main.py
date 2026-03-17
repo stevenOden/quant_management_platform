@@ -59,6 +59,8 @@ async def run_buy_signal_pipeline():
                     event.holding_since = datetime.now()
                     # TODO: What to do if the portfolio and execution service become unsynced? No more trades will be placed, but cannot sell current positions
 
+                    event.current_price = round(current_price,2)
+
                     # 5. Update the IntradayWatchlist to add this symbol to the intraday stream
                     intraday_watch = await data_service_client.add_intraday_watchlist_symbol(event.symbol)
                     if intraday_watch:

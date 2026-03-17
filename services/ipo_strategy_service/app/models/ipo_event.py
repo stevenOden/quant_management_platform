@@ -53,4 +53,5 @@ class IPOEvent(SQLModel, table=True):
     position_exit_value: float | None = None # Default to None on DISCOVERY State
     position_pnl: float | None = None # Default to None on DISCOVERY State
 
+    current_price : float | None = None # Default to None on DISCOVERY State
 
